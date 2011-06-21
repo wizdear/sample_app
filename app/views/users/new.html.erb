@@ -1,6 +1,6 @@
 <h1>Sign up</h1>
 
-<%= form_for(@user) do |f| %>
+<%= form_for(@user) do | f | %>
   <%= render 'shared/error_messages' %>
   <div class="field">
     <%= f.label :name %><br />
@@ -12,13 +12,13 @@
   </div>
   <div class="field">
     <%= f.label :password %><br />
-    <%= f.password_field :password %>
+    <%= f.password_field( :password ) %>
   </div>
   <div class="field">
     <%= f.label :password_confirmation, "Confirmation" %><br />
-    <%= f.password_field :password_confirmation %>
+    <%= f.password_field( :password_confirmation ) %>
   </div>
   <div class="actions">
-    <%= f.submit "Sign up" %>
+    <%= f.submit( "Sign up" ) %>
   </div>
 <% end %>
