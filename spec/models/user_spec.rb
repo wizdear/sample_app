@@ -113,37 +113,52 @@ describe User do
         matching_user.should == @user
       end
     end
-  
-  end
-  
-  describe "has_password? method" do
+    describe "has_password? method" do
     
-    it "shoud be true if the passwords match" do
-      @user.has_password?(@attr[:password]).should be_true
+      it "shoud be true if the passwords match" do
+       @user.has_password?(@attr[:password]).should be_true
+      end
+    
+      it "shoud be true if the passwords don't match" do
+       @user.has_password?("invalid").should be_false
+      end
     end
-    
-    it "shoud be true if the passwords don't match" do
-      @user.has_password?("invalid").should be_false
-    end
-    
   end
-  describe "admin attribute" do
+  describe "micropost associations" do
 
     before(:each) do
-      @user = User.create!(@attr)
+      @user = User.create(@attr)
+      @mp1 = Factory(:micropost, :user => @user, :created_at => 1.day.ago)
+      @mp2 = Factory(:micropost, :user => @user, :created_at => 1.hour.ago)
     end
 
-    it "should respond to admin" do
-      @user.should respond_to(:admin)
+    it "should have a microposts attribute" do
+      @user.should respond_to(:microposts)
     end
-
-    it "should not be an admin by default" do
-      @user.should_not be_admin
+    
+    it "should destroy associated microposts" do
+      @user.destroy
+      [@mp1, @mp2].each do |micropost|
+        Micropost.find_by_id(micropost.id).should be_nil
+      end
     end
+    
+    describe "status feed" do
 
-    it "should be convertible to an admin" do
-      @user.toggle!(:admin)
-      @user.should be_admin
+      it "should have a feed" do
+        @user.should respond_to(:feed)
+      end
+
+      it "should include the user's microposts" do
+        @user.feed.include?(@mp1).should be_true
+        @user.feed.include?(@mp2).should be_true
+      end
+
+      it "should not include a different user's microposts" do
+        mp3 = Factory(:micropost,
+                      :user => Factory(:user, :email => Factory.next(:email)))
+        @user.feed.include?(mp3).should be_false
+      end
     end
   end
 end
